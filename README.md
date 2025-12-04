@@ -7,7 +7,7 @@
 - Basic Memory: https://github.com/basicmachines-co/basic-memory
 - Episodic Memory: https://github.com/obra/episodic-memory
 - Claude Code Viewer: https://github.com/d-kimuson/claude-code-viewer
-
+- Recall: https://github.com/zippoxer/recall
 ## MCPs
 - Exa MCP: https://docs.exa.ai/reference/exa-mcp
 - Deepwiki MCP: https://docs.devin.ai/work-with-devin/deepwiki-mcp?utm_source=ai-bot.cn
