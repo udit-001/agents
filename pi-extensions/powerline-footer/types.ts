@@ -33,7 +33,7 @@ export type StatusLineSegmentId =
   | "token_in"
   | "token_out"
   | "token_total"
-  | "codex"
+  | "usage_status"
   | "context_pct"
   | "context_total"
   | "time_spent"

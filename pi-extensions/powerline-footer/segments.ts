@@ -255,15 +255,15 @@ const tokenTotalSegment: StatusLineSegment = {
   },
 };
 
-const codexSegment: StatusLineSegment = {
-  id: "codex",
+const usageStatusSegment: StatusLineSegment = {
+  id: "usage_status",
   render(ctx) {
     const usage = ctx.codexUsage;
     if (!usage) return { content: "", visible: false };
 
     const remaining = Math.round(usage.remainingPercent);
     const reset = formatDurationSeconds(usage.resetAfterSeconds);
-    let label = `codex:${remaining}%/${reset}`;
+    let label = `usage:${remaining}%/${reset}`;
 
     if (typeof usage.weeklyRemainingPercent === "number" && typeof usage.weeklyResetAfterSeconds === "number") {
       const weeklyRemaining = Math.round(usage.weeklyRemainingPercent);
@@ -453,7 +453,7 @@ export const SEGMENTS: Record<StatusLineSegmentId, StatusLineSegment> = {
   token_in: tokenInSegment,
   token_out: tokenOutSegment,
   token_total: tokenTotalSegment,
-  codex: codexSegment,
+  usage_status: usageStatusSegment,
   context_pct: contextPctSegment,
   context_total: contextTotalSegment,
   time_spent: timeSpentSegment,

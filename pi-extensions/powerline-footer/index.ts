@@ -14,6 +14,16 @@ import { WelcomeHeader, discoverLoadedCounts, getRecentSessions } from "./welcom
 import { getDefaultColors } from "./theme.js";
 import { fetchCodexUsageSummary, fetchZaiUsageSummary } from "./usage-monitor.js";
 
+type UsageProvider = "zai" | "openai";
+
+function getProviderFromModelId(modelId: string | undefined): UsageProvider {
+  const id = (modelId || "").toLowerCase().trim();
+  if (id.startsWith("glm")) return "zai";
+  if (id.startsWith("gpt")) return "openai";
+  if (id.includes("z.ai") || id.startsWith("zai/") || id.startsWith("z.ai/")) return "zai";
+  return "openai";
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Configuration
 // ═══════════════════════════════════════════════════════════════════════════
@@ -159,10 +169,13 @@ export default function powerlineFooter(pi: ExtensionAPI) {
 
     codexUsageInFlight = (async () => {
       try {
-        // Prefer Z.ai window usage if configured; otherwise fall back to OpenAI/Codex
-        try {
+        // Choose provider based on currently selected model
+        const modelId = currentCtx?.model?.id;
+        const provider = getProviderFromModelId(modelId);
+
+        if (provider === "zai") {
           codexUsage = await fetchZaiUsageSummary();
-        } catch {
+        } else {
           codexUsage = await fetchCodexUsageSummary();
         }
       } catch {

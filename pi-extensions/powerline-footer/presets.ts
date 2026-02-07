@@ -25,7 +25,7 @@ const NERD_COLORS: ColorScheme = {
 
 export const PRESETS: Record<StatusLinePreset, PresetDef> = {
   default: {
-    leftSegments: ["pi", "model", "thinking", "path", "git", "context_pct", "cache_read", "codex"],
+    leftSegments: ["pi", "model", "thinking", "path", "git", "context_pct", "cache_read", "usage_status"],
     rightSegments: [],
     secondarySegments: ["extension_statuses"],
     separator: "powerline-thin",
@@ -50,7 +50,7 @@ export const PRESETS: Record<StatusLinePreset, PresetDef> = {
 
   compact: {
     leftSegments: ["model", "git"],
-    rightSegments: ["codex", "context_pct"],
+    rightSegments: ["usage_status", "context_pct"],
     separator: "powerline-thin",
     colors: DEFAULT_COLORS,
     segmentOptions: {
@@ -61,7 +61,7 @@ export const PRESETS: Record<StatusLinePreset, PresetDef> = {
 
   full: {
     leftSegments: ["pi", "hostname", "model", "thinking", "path", "git", "subagents"],
-    rightSegments: ["token_in", "token_out", "cache_read", "codex", "context_pct", "time_spent", "time", "extension_statuses"],
+    rightSegments: ["token_in", "token_out", "cache_read", "usage_status", "context_pct", "time_spent", "time", "extension_statuses"],
     separator: "powerline",
     colors: DEFAULT_COLORS,
     segmentOptions: {
@@ -74,7 +74,7 @@ export const PRESETS: Record<StatusLinePreset, PresetDef> = {
 
   nerd: {
     leftSegments: ["pi", "hostname", "model", "thinking", "path", "git", "session", "subagents"],
-    rightSegments: ["token_in", "token_out", "cache_read", "cache_write", "codex", "context_pct", "context_total", "time_spent", "time", "extension_statuses"],
+    rightSegments: ["token_in", "token_out", "cache_read", "cache_write", "usage_status", "context_pct", "context_total", "time_spent", "time", "extension_statuses"],
     separator: "powerline",
     colors: NERD_COLORS,
     segmentOptions: {
@@ -87,7 +87,7 @@ export const PRESETS: Record<StatusLinePreset, PresetDef> = {
 
   ascii: {
     leftSegments: ["model", "path", "git"],
-    rightSegments: ["token_total", "codex", "context_pct"],
+    rightSegments: ["token_total", "usage_status", "context_pct"],
     separator: "ascii",
     colors: MINIMAL_COLORS,
     segmentOptions: {
@@ -99,7 +99,7 @@ export const PRESETS: Record<StatusLinePreset, PresetDef> = {
 
   custom: {
     leftSegments: ["model", "path", "git"],
-    rightSegments: ["token_total", "codex", "context_pct"],
+    rightSegments: ["token_total", "usage_status", "context_pct"],
     separator: "powerline-thin",
     colors: DEFAULT_COLORS,
     segmentOptions: {},
