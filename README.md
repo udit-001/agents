@@ -19,6 +19,13 @@ A lightweight catalog of tools used with both Claude Code and Pi.
 - Powerline Footer: pi-extensions/powerline-footer
 - Review: pi-extensions/review
 - Todos: pi-extensions/todos
+- Permission: pi-extensions/permission
+
+**Permission commands (in Pi):**
+- `/permission` (or `/permission <minimal|low|medium|high>`) — view/change permission level
+- `/permission-mode <ask|block>` — whether Pi prompts or blocks when higher permission is required
+
+**Print mode:** `PI_PERMISSION_LEVEL=medium pi -p "..."`
 
 ### Global
 - [pi-interactive-shell](https://github.com/nicobailon/pi-interactive-shell)
