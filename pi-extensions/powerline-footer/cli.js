@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const targetDir = join(homedir(), ".pi", "agent", "extensions", "powerline-footer");
+const targetDir = join(homedir(), ".pi", "agent", "extensions", "usage-monitor");
 
 // Files to copy (TypeScript sources + docs)
 const files = readdirSync(__dirname).filter(

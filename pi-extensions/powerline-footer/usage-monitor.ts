@@ -34,9 +34,31 @@ interface OpenCodeAuthData {
     access?: string;
     expires?: number;
   };
+  "zai-coding-plan"?: {
+    type?: string;
+    key?: string;
+  };
+}
+
+interface ZaiUsageLimitItem {
+  type: "TIME_LIMIT" | "TOKENS_LIMIT";
+  usage: number;
+  currentValue: number;
+  percentage: number;
+  nextResetTime?: number;
+}
+
+interface ZaiQuotaLimitResponse {
+  code: number;
+  msg: string;
+  success: boolean;
+  data: {
+    limits: ZaiUsageLimitItem[];
+  };
 }
 
 const OPENAI_USAGE_URL = "https://chatgpt.com/backend-api/wham/usage";
+const ZAI_USAGE_URL = "https://api.z.ai/api/monitor/usage/quota/limit";
 const CONFIG_PATH = join(homedir(), ".pi", "agent", "codex-status.json");
 const OPENCODE_AUTH_PATH = join(homedir(), ".local", "share", "opencode", "auth.json");
 const REQUEST_TIMEOUT_MS = 10000;
@@ -144,6 +166,112 @@ async function loadAccessToken(): Promise<string> {
   }
 
   throw new Error("No ChatGPT OAuth access token found");
+}
+
+async function readOpenCodeZaiApiKey(): Promise<string | null> {
+  try {
+    const content = await readFile(OPENCODE_AUTH_PATH, "utf-8");
+    const auth = JSON.parse(content) as OpenCodeAuthData;
+    const zai = auth["zai-coding-plan"];
+
+    if (!zai || !zai.key) {
+      return null;
+    }
+
+    return zai.key;
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as NodeJS.ErrnoException).code === "ENOENT"
+    ) {
+      return null;
+    }
+
+    throw error instanceof Error ? error : new Error("Failed to read OpenCode auth.json");
+  }
+}
+
+async function loadZaiApiKey(): Promise<string> {
+  // Priority: env first, then OpenCode auth.json
+  const envKey = process.env.ZAI_API_KEY || process.env.ZAI_TOKEN;
+  if (envKey) return envKey;
+
+  const opencodeKey = await readOpenCodeZaiApiKey();
+  if (opencodeKey) return opencodeKey;
+
+  throw new Error("No Z.ai API key found (set ZAI_API_KEY or configure zai-coding-plan in OpenCode auth.json)");
+}
+
+async function fetchZaiUsage(apiKey: string): Promise<ZaiQuotaLimitResponse> {
+  const headers: Record<string, string> = {
+    Authorization: apiKey,
+    "Content-Type": "application/json",
+    "User-Agent": "pi-codex-status/1.0",
+  };
+
+  const response = await fetchWithTimeout(ZAI_USAGE_URL, { headers });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Z.ai usage API error (${response.status}): ${errorText}`);
+  }
+
+  return response.json() as Promise<ZaiQuotaLimitResponse>;
+}
+
+function normalizeZaiWindows(data: ZaiQuotaLimitResponse): {
+  remainingPercent: number;
+  resetAfterSeconds: number;
+  limitReached: boolean;
+  planType: string;
+  weeklyRemainingPercent?: number;
+  weeklyResetAfterSeconds?: number;
+} {
+  if (!data.success || data.code !== 200) {
+    throw new Error(`Z.ai API error (${data.code}): ${data.msg || "Unknown error"}`);
+  }
+
+  const limits = data.data?.limits ?? [];
+  const tokenLimit = limits.find((l) => l.type === "TOKENS_LIMIT");
+
+  if (!tokenLimit) {
+    throw new Error("Missing TOKENS_LIMIT in Z.ai usage response");
+  }
+
+  const remainingPercent = Math.max(0, Math.min(100, 100 - tokenLimit.percentage));
+
+  let resetAfterSeconds = 0;
+  if (typeof tokenLimit.nextResetTime === "number") {
+    resetAfterSeconds = Math.max(0, Math.round((tokenLimit.nextResetTime - Date.now()) / 1000));
+  }
+
+  const maxUsedPercent = limits.reduce((acc, l) => Math.max(acc, l.percentage ?? 0), 0);
+  const limitReached = maxUsedPercent >= 100;
+
+  return {
+    remainingPercent,
+    resetAfterSeconds,
+    limitReached,
+    planType: "z.ai",
+    // weekly* currently not known for z.ai, leave undefined
+  };
+}
+
+export async function fetchZaiUsageSummary(): Promise<CodexUsageSummary> {
+  const key = await loadZaiApiKey();
+  const usage = await fetchZaiUsage(key);
+  const normalized = normalizeZaiWindows(usage);
+
+  return {
+    remainingPercent: normalized.remainingPercent,
+    resetAfterSeconds: normalized.resetAfterSeconds,
+    limitReached: normalized.limitReached,
+    planType: normalized.planType,
+    weeklyRemainingPercent: normalized.weeklyRemainingPercent,
+    weeklyResetAfterSeconds: normalized.weeklyResetAfterSeconds,
+  };
 }
 
 async function fetchOpenAIUsage(accessToken: string): Promise<OpenAIUsageResponse> {

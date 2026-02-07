@@ -15,7 +15,7 @@ A lightweight catalog of tools used with both Claude Code and Pi.
 
 ### Project
 - Answer: pi-extensions/answer
-- Codex Status: pi-extensions/codex-status
+- Usage Status: pi-extensions/usage-status
 - Powerline Footer: pi-extensions/powerline-footer
 - Review: pi-extensions/review
 - Todos: pi-extensions/todos

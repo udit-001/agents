@@ -12,7 +12,7 @@ import { getGitStatus, invalidateGitStatus, invalidateGitBranch } from "./git-st
 import { ansi, getFgAnsiCode } from "./colors.js";
 import { WelcomeHeader, discoverLoadedCounts, getRecentSessions } from "./welcome.js";
 import { getDefaultColors } from "./theme.js";
-import { fetchCodexUsageSummary } from "./codex-usage.js";
+import { fetchCodexUsageSummary, fetchZaiUsageSummary } from "./usage-monitor.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Configuration
@@ -159,7 +159,12 @@ export default function powerlineFooter(pi: ExtensionAPI) {
 
     codexUsageInFlight = (async () => {
       try {
-        codexUsage = await fetchCodexUsageSummary();
+        // Prefer Z.ai window usage if configured; otherwise fall back to OpenAI/Codex
+        try {
+          codexUsage = await fetchZaiUsageSummary();
+        } catch {
+          codexUsage = await fetchCodexUsageSummary();
+        }
       } catch {
         codexUsage = null;
       } finally {

@@ -1,10 +1,10 @@
 {
-  "name": "pi-powerline-footer",
+  "name": "usage-monitor",
   "version": "0.2.23",
-  "description": "Powerline-style status bar extension for pi coding agent",
+  "description": "Usage monitor extension for pi coding agent (OpenAI/Codex + Z.ai)",
   "type": "module",
   "bin": {
-    "pi-powerline-footer": "./cli.js"
+    "usage-monitor": "./cli.js"
   },
   "files": [
     "*.ts",
@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nicobailon/pi-powerline-footer.git"
+    "url": "git+https://github.com/your-org/usage-monitor.git"
   },
   "pi": {
     "extensions": [
